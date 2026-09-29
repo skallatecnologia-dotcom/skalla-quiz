@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Skalla.ai | Diagnóstico gratuito</title>
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1919901012045055');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1919901012045055&ev=PageView&noscript=1"/></noscript>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#06030f;color:#f1eeff;min-height:100vh;overflow-x:hidden}
+
+.shell{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 16px 64px;
+  background:radial-gradient(ellipse at 20% 0%, rgba(115,64,216,0.15) 0%, #06030f 60%);
+}
+
+/* TOP */
+.top{width:100%;max-width:480px;padding:28px 0 20px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.logo{height:28px;width:auto}
+
+/* PROGRESS */
+.prog-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a07af5}
+.prog-bg{width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#7340d8,#818cf8);border-radius:99px;transition:width .5s ease;width:0%}
+
+/* SCREEN */
+.screen{width:100%;max-width:480px;display:none;flex-direction:column;gap:20px}
+.screen.show{display:flex}
+
+/* CARD */
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(115,64,216,0.2);border-radius:20px;padding:28px 22px;display:flex;flex-direction:column;gap:20px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(115,64,216,0.12);border:1px solid rgba(160,122,245,0.3);border-radius:99px;padding:6px 14px;width:fit-content}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:#a07af5;animation:blink 1.4s infinite}
+.badge-txt{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a07af5}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* STEP LABEL */
+.step-lbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a07af5}
+
+/* QUESTION */
+.q{font-family:'Outfit',sans-serif;font-size:21px;font-weight:800;line-height:1.3;color:#fff}
+.q span{background:linear-gradient(135deg,#a07af5,#6366f1,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:13px;color:#9d8cc4;margin-top:-10px;line-height:1.6}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1.5px solid rgba(115,64,216,0.2);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;text-align:left;width:100%;color:#c4abff;font-size:14px;font-weight:500;font-family:'Inter',sans-serif}
+.opt:hover{border-color:rgba(160,122,245,0.5);background:rgba(115,64,216,0.1);color:#fff}
+.opt.sel{border-color:#7340d8;background:rgba(115,64,216,0.15);color:#fff}
+.opt-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:rgba(115,64,216,0.15)}
+.opt-chk{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);margin-left:auto;flex-shrink:0;transition:all .2s;position:relative}
+.opt.sel .opt-chk{background:#7340d8;border-color:#7340d8}
+.opt.sel .opt-chk::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#fff;font-weight:900}
+
+/* BUTTON */
+.btn{width:100%;padding:15px;border-radius:99px;border:none;font-size:15px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,#7340d8,#5e2ebf,#4f46e5);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(115,64,216,0.4)}
+.btn-secondary{background:rgba(19,13,46,0.8);border:1px solid rgba(115,64,216,0.4);color:#c4abff}
+.btn-secondary:hover{background:rgba(115,64,216,0.15);color:#fff}
+.btn-disabled{background:rgba(115,64,216,0.2);color:rgba(255,255,255,0.3);cursor:not-allowed}
+.btn-wpp{background:#25D366;color:#fff;font-size:16px}
+.btn-wpp:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,0.4)}
+
+/* INPUTS */
+.inp-grp{display:flex;flex-direction:column;gap:6px}
+.inp-lbl{font-size:12px;font-weight:600;color:#6b5a8a;letter-spacing:.3px}
+.inp{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(115,64,216,0.2);border-radius:12px;padding:13px 14px;color:#fff;font-size:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.inp::placeholder{color:rgba(255,255,255,.2)}
+.inp:focus{border-color:rgba(160,122,245,.5)}
+
+/* SOLUTION CARD */
+.sol-card{background:rgba(115,64,216,0.08);border:1px solid rgba(115,64,216,0.3);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.sol-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#c4abff;line-height:1.5}
+.sol-check{width:20px;height:20px;border-radius:50%;background:rgba(115,64,216,0.2);border:1px solid rgba(160,122,245,0.4);display:flex;align-items:center;justify-content:center;font-size:10px;color:#a07af5;font-weight:900;flex-shrink:0;margin-top:1px}
+
+/* DIFF CARDS */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.diff-card{background:rgba(255,255,255,0.03);border:1px solid rgba(115,64,216,0.2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.diff-ico{font-size:20px}
+.diff-t{font-size:12px;font-weight:700;color:#fff}
+.diff-d{font-size:11px;color:#6b5a8a;line-height:1.5}
+
+/* PLANS */
+.plan-card{background:rgba(255,255,255,0.03);border:1px solid rgba(115,64,216,0.2);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.plan-card.highlight{border-color:rgba(115,64,216,0.5);background:rgba(115,64,216,0.1)}
+.plan-name{font-size:13px;font-weight:700;color:#fff}
+.plan-price{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#a07af5,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plan-feat{font-size:11px;color:#6b5a8a;line-height:1.6}
+.plan-badge{font-size:10px;font-weight:700;background:linear-gradient(135deg,#7340d8,#4f46e5);color:#fff;padding:3px 10px;border-radius:99px;width:fit-content}
+
+/* MOCKUP DISPAROS */
+.mock-disparos{background:rgba(13,8,32,0.95);border:1px solid rgba(115,64,216,0.3);border-radius:16px;overflow:hidden}
+.mock-header{background:rgba(10,4,18,0.9);padding:10px 14px;display:flex;align-items:center;justify-between;gap:8px;border-bottom:1px solid rgba(115,64,216,0.15)}
+.mock-dots{display:flex;gap:5px}
+.mock-dot{width:10px;height:10px;border-radius:50%}
+.mock-title{font-size:11px;color:#6b5a8a;font-weight:600}
+.mock-body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.mock-stat{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(26,18,64,0.6);border:1px solid rgba(115,64,216,0.15);border-radius:10px}
+.mock-stat-label{font-size:11px;color:#6b5a8a}
+.mock-stat-val{font-size:13px;font-weight:700;color:#a07af5}
+.mock-stat-val.green{color:#4ade80}
+.mock-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(26,18,64,0.4);border:1px solid rgba(115,64,216,0.1);border-radius:10px}
+.mock-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7340d8,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.mock-info{flex:1}
+.mock-name{font-size:12px;font-weight:600;color:#e0d4ff}
+.mock-msg{font-size:10px;color:#6b5a8a;margin-top:1px}
+.mock-status{font-size:10px;font-weight:600;color:#4ade80}
+
+/* LOADING */
+.spin{width:64px;height:64px;border-radius:50%;border:3px solid rgba(115,64,216,0.15);border-top-color:#7340d8;animation:spin .9s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ls-list{display:flex;flex-direction:column;gap:10px;width:100%}
+.ls-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(115,64,216,0.15);border-radius:12px;font-size:13px;color:#6b5a8a;opacity:0;transform:translateY(8px);transition:all .4s ease}
+.ls-item.on{opacity:1;transform:translateY(0);color:#c4abff;border-color:rgba(115,64,216,0.3)}
+.ls-ico{width:26px;height:26px;border-radius:50%;background:rgba(115,64,216,0.15);border:1px solid rgba(160,122,245,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+
+/* SUCCESS */
+.suc-ico{width:80px;height:80px;border-radius:50%;background:rgba(115,64,216,0.15);border:2px solid rgba(160,122,245,0.4);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto;animation:pop .5s cubic-bezier(.18,.89,.32,1.28)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.suc-note{font-size:13px;color:#9d8cc4;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(115,64,216,0.2);border-radius:12px;width:100%;text-align:center;line-height:1.6}
+
+.foot{font-size:11px;color:rgba(255,255,255,.15);text-align:center}
+.divider{height:1px;background:rgba(115,64,216,0.15);width:100%}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP -->
+  <div class="top">
+    <img src="./logomarca300x80branca.png" alt="Skalla.ai" class="logo"/>
+    <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div class="prog-label" id="prog-label">DIAGNÓSTICO SKALLA.AI</div>
+      <div class="prog-bg"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- CAPA -->
+  <div class="screen show" id="s0">
+    <div class="card">
+      <div class="badge"><div class="badge-dot"></div><span class="badge-txt">Plataforma completa de atendimento no WhatsApp</span></div>
+      <div>
+        <h1 class="q">A plataforma completa de atendimento no WhatsApp: <span>IA que qualifica e disparos com API oficial.</span></h1>
+        <p class="sub" style="margin-top:12px">Uma IA que responde e qualifica seus leads em segundos, somada a disparos em massa pela API oficial do WhatsApp, com proteção contra banimento. Sua operação de atendimento e prospecção centralizada e automatizada, sem lead perdido e sem número queimado.</p>
+      </div>
+
+      <!-- Mockup de disparos reais -->
+      <div class="mock-disparos">
+        <div class="mock-header">
+          <div class="mock-dots">
+            <div class="mock-dot" style="background:rgba(239,68,68,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(234,179,8,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(34,197,94,0.7)"></div>
+          </div>
+          <span class="mock-title">Campanha de Disparo — Skalla.ai</span>
+          <span style="font-size:10px;color:#4ade80;font-weight:700">● Ativo</span>
+        </div>
+        <div class="mock-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Enviados</span>
+              <span class="mock-stat-val">1.284</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Entregues</span>
+              <span class="mock-stat-val green">1.271</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Respondidos</span>
+              <span class="mock-stat-val green">342</span>
+            </div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">JR</div>
+            <div class="mock-info">
+              <div class="mock-name">João Ricardo</div>
+              <div class="mock-msg">Tenho interesse! Qual o próximo passo?</div>
+            </div>
+            <div class="mock-status">Respondeu</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">MC</div>
+            <div class="mock-info">
+              <div class="mock-name">Maria Clara</div>
+              <div class="mock-msg">Quero saber mais sobre o serviço.</div>
+            </div>
+            <div class="mock-status">Respondeu</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">PT</div>
+            <div class="mock-info">
+              <div class="mock-name">Pedro Tavares</div>
+              <div class="mock-msg">Boa tarde, pode me ligar?</div>
+            </div>
+            <div class="mock-status">Respondeu</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p style="font-size:11px;font-weight:700;color:#6b5a8a;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">Você vai descobrir</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="sol-item"><div class="sol-check">✓</div>Qual problema está travando sua operação hoje</div>
+          <div class="sol-item"><div class="sol-check">✓</div>Como a Skalla.ai resolve especificamente o seu caso</div>
+          <div class="sol-item"><div class="sol-check">✓</div>Qual plano é ideal para o seu volume de leads</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(1)">Fazer meu diagnóstico grátis ›</button>
+      <p class="foot">Leva menos de 2 minutos · Sem compromisso</p>
+    </div>
+  </div>
+
+  <!-- ETAPA 1 — DOR PRINCIPAL (bifurcação) -->
+  <div class="screen" id="s1">
+    <div class="card">
+      <span class="step-lbl">Etapa 01 de 05</span>
+      <h2 class="q">Qual problema te custou mais dinheiro nos últimos 30 dias?</h2>
+      <p class="sub">Seja honesto. Essa resposta define qual solução vamos apresentar para você.</p>
+      <div class="opts" id="opts1">
+        <button class="opt" onclick="pickDor(this,'atendimento','Leads chegam mas a equipe demora para responder e eles somem')">
+          <div class="opt-ico">🕐</div>
+          <span>Leads chegam mas a equipe demora para responder e eles somem</span>
+          <div class="opt-chk"></div>
+        </button>
+        <button class="opt" onclick="pickDor(this,'bloqueio','WhatsApp cai ou foi bloqueado e perco vendas')">
+          <div class="opt-ico">🚫</div>
+          <span>Meu WhatsApp cai ou foi bloqueado e perco vendas</span>
+          <div class="opt-chk"></div>
+        </button>
+        <button class="opt" onclick="pickDor(this,'ambos','Os dois acontecem aqui')">
+          <div class="opt-ico">💸</div>
+          <span>Os dois acontecem aqui</span>
+          <div class="opt-chk"></div>
+        </button>
+      </div>
+      <button class="btn btn-disabled" id="b1" onclick="next1()">Continuar ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2A — APROFUNDA ATENDIMENTO -->
+  <div class="screen" id="s2a">
+    <div class="card">
+      <span class="step-lbl">Etapa 02 de 05</span>
+      <h2 class="q">Quanto tempo sua equipe leva para responder um lead novo?</h2>
+      <div class="opts" id="opts2a">
+        <button class="opt" onclick="pick(this,'2','Menos de 5 minutos')"><div class="opt-ico">⚡</div><span>Menos de 5 minutos</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Entre 5 e 30 minutos')"><div class="opt-ico">⏱️</div><span>Entre 5 e 30 minutos</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Mais de 30 minutos')"><div class="opt-ico">🐢</div><span>Mais de 30 minutos</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Às vezes nem respondemos')"><div class="opt-ico">😰</div><span>Às vezes nem respondemos</span><div class="opt-chk"></div></button>
+      </div>
+      <button class="btn btn-disabled" id="b2" onclick="goTo('3a')">Continuar ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2B — APROFUNDA BLOQUEIO -->
+  <div class="screen" id="s2b">
+    <div class="card">
+      <span class="step-lbl">Etapa 02 de 05</span>
+      <h2 class="q">Com que frequência você enfrenta bloqueios no WhatsApp?</h2>
+      <div class="opts" id="opts2b">
+        <button class="opt" onclick="pick(this,'2','Raramente, mas me preocupa')"><div class="opt-ico">😟</div><span>Raramente, mas me preocupa</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Já perdi número e tive que recomeçar do zero')"><div class="opt-ico">😱</div><span>Já perdi número e tive que recomeçar do zero</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Fico bloqueado toda semana')"><div class="opt-ico">🔥</div><span>Fico bloqueado toda semana</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pick(this,'2','Uso vários chips para tentar driblar')"><div class="opt-ico">📱</div><span>Uso vários chips para tentar driblar</span><div class="opt-chk"></div></button>
+      </div>
+      <button class="btn btn-disabled" id="b2b" onclick="goTo('3b')">Continuar ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3A — SOLUÇÃO ATENDIMENTO + API OFICIAL -->
+  <div class="screen" id="s3a">
+    <div class="card">
+      <span class="step-lbl">Etapa 03 de 05 — Sua solução</span>
+      <h2 class="q">Sua operação precisa de <span>IA que qualifica e disparos com API oficial.</span></h2>
+      <p class="sub">Uma IA que responde e qualifica seus leads em segundos, somada a disparos em massa pela API oficial do WhatsApp, com proteção contra banimento. Sem lead perdido e sem número queimado.</p>
+
+      <p style="font-size:11px;font-weight:700;color:#a07af5;text-transform:uppercase;letter-spacing:1.5px">IA de atendimento</p>
+      <div class="sol-card">
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Resposta em menos de 3 segundos</strong> — a IA atende 24h, 7 dias por semana, sem depender da sua equipe</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Qualificação automática</strong> — a IA faz as perguntas certas baseadas no seu script de vendas</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Follow-up D1, D2 e D3</strong> — leads que somem recebem mensagens automáticas de reengajamento nos dias seguintes</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Transbordo inteligente</strong> — quando o lead está pronto para fechar, a IA passa para um humano automaticamente</span></div>
+      </div>
+
+      <!-- Mini mockup chat IA -->
+      <div style="background:rgba(13,8,32,0.9);border:1px solid rgba(115,64,216,0.25);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:10px;font-weight:700;color:#6b5a8a;text-transform:uppercase;letter-spacing:1.5px;text-align:center">Atendimento ao vivo — Skalla.ai</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(26,18,64,0.8);border:1px solid rgba(115,64,216,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px">👤</div>
+          <div style="background:rgba(26,18,64,0.6);border:1px solid rgba(115,64,216,0.15);border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:12px;color:#c4abff;max-width:85%">Oi, vi o anúncio de vocês. Quanto custa?</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7340d8,#4f46e5);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px">⚡</div>
+          <div style="background:rgba(115,64,216,0.15);border:1px solid rgba(160,122,245,0.2);border-radius:12px 12px 4px 12px;padding:10px 12px;font-size:12px;color:#e0d4ff;max-width:85%">Olá! Que ótimo que você chegou aqui. O valor varia de acordo com o volume da sua operação. Para te passar o plano ideal, me conta: quantos leads você recebe por mês?</div>
+        </div>
+        <div style="text-align:center;font-size:10px;color:#a07af5;background:rgba(115,64,216,0.08);border:1px solid rgba(160,122,245,0.15);border-radius:99px;padding:5px 12px">⚡ Respondido em 2 segundos</div>
+      </div>
+
+      <p style="font-size:11px;font-weight:700;color:#a07af5;text-transform:uppercase;letter-spacing:1.5px">API oficial do WhatsApp</p>
+      <div class="sol-card">
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Número verificado pela Meta</strong> — sem risco de banimento, mesmo fazendo disparos em volume</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Disparos em massa com rastreamento</strong> — envie para sua base inteira e veja quem entregou, leu e respondeu</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Templates de utilidade</strong> — mensagens aprovadas pela Meta que chegam mesmo para quem não salvou seu número</span></div>
+      </div>
+
+      <!-- Mockup disparos -->
+      <div class="mock-disparos">
+        <div class="mock-header">
+          <div class="mock-dots">
+            <div class="mock-dot" style="background:rgba(239,68,68,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(234,179,8,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(34,197,94,0.7)"></div>
+          </div>
+          <span class="mock-title">Campanha ativa — API Oficial</span>
+          <span style="font-size:10px;color:#4ade80;font-weight:700">● Enviando</span>
+        </div>
+        <div class="mock-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Enviados</span>
+              <span class="mock-stat-val">1.284</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Entregues</span>
+              <span class="mock-stat-val green">99.0%</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Respondidos</span>
+              <span class="mock-stat-val green">342</span>
+            </div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">JR</div>
+            <div class="mock-info">
+              <div class="mock-name">João Ricardo</div>
+              <div class="mock-msg">Tenho interesse! Qual o próximo passo?</div>
+            </div>
+            <div class="mock-status">Respondeu ✓✓</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">MC</div>
+            <div class="mock-info">
+              <div class="mock-name">Maria Clara</div>
+              <div class="mock-msg">Quero saber mais sobre o serviço.</div>
+            </div>
+            <div class="mock-status">Respondeu ✓✓</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(4)">Quero essa solução ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3B — SOLUÇÃO BLOQUEIO / API OFICIAL -->
+  <div class="screen" id="s3b">
+    <div class="card">
+      <span class="step-lbl">Etapa 03 de 05 — Sua solução</span>
+      <h2 class="q">Sua operação precisa de um <span>número blindado pela API oficial do WhatsApp.</span></h2>
+      <p class="sub">Chega de chips queimados e números perdidos. Com a API oficial, você envia em massa com segurança e nunca mais perde sua base de contatos por bloqueio.</p>
+
+      <div class="sol-card">
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">API oficial do WhatsApp</strong> — número verificado pela Meta, sem risco de banimento por disparo</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Templates de utilidade</strong> — mensagens aprovadas pela Meta que chegam mesmo para quem não salvou seu número</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Disparos em massa controlados</strong> — envie para sua base inteira com rastreamento de entrega e resposta</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Proteção de reputação</strong> — a Skalla monitora sua taxa de reclamação e ajusta os envios automaticamente</span></div>
+        <div class="sol-item"><div class="sol-check">✓</div><span><strong style="color:#fff">Número da sua empresa</strong> — sem chip, sem celular extra, direto no sistema</span></div>
+      </div>
+
+      <!-- Mockup disparo -->
+      <div class="mock-disparos">
+        <div class="mock-header">
+          <div class="mock-dots">
+            <div class="mock-dot" style="background:rgba(239,68,68,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(234,179,8,0.7)"></div>
+            <div class="mock-dot" style="background:rgba(34,197,94,0.7)"></div>
+          </div>
+          <span class="mock-title">Campanha ativa — API Oficial</span>
+          <span style="font-size:10px;color:#4ade80;font-weight:700">● Enviando</span>
+        </div>
+        <div class="mock-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Enviados</span>
+              <span class="mock-stat-val">1.284</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Entregues</span>
+              <span class="mock-stat-val green">99.0%</span>
+            </div>
+            <div class="mock-stat" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <span class="mock-stat-label">Respondidos</span>
+              <span class="mock-stat-val green">342</span>
+            </div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">JR</div>
+            <div class="mock-info">
+              <div class="mock-name">João Ricardo</div>
+              <div class="mock-msg">Tenho interesse! Qual o próximo passo?</div>
+            </div>
+            <div class="mock-status">Respondeu ✓✓</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-avatar">MC</div>
+            <div class="mock-info">
+              <div class="mock-name">Maria Clara</div>
+              <div class="mock-msg">Quero saber mais sobre o serviço.</div>
+            </div>
+            <div class="mock-status">Respondeu ✓✓</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(4)">Quero essa solução ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4 — VOLUME DE LEADS -->
+  <div class="screen" id="s4">
+    <div class="card">
+      <span class="step-lbl">Etapa 04 de 05</span>
+      <h2 class="q">Quantos leads você recebe por mês pelo WhatsApp?</h2>
+      <p class="sub">Isso vai definir qual plano é ideal para o seu volume.</p>
+      <div class="opts" id="opts4">
+        <button class="opt" onclick="pickPlano(this,'Menos de 100 leads/mês','essencial')"><div class="opt-ico">🌱</div><span>Menos de 100 leads/mês</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pickPlano(this,'Entre 100 e 500 leads/mês','profissional')"><div class="opt-ico">📈</div><span>Entre 100 e 500 leads/mês</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pickPlano(this,'Entre 500 e 2.000 leads/mês','profissional')"><div class="opt-ico">🚀</div><span>Entre 500 e 2.000 leads/mês</span><div class="opt-chk"></div></button>
+        <button class="opt" onclick="pickPlano(this,'Mais de 2.000 leads/mês','enterprise')"><div class="opt-ico">🏢</div><span>Mais de 2.000 leads/mês</span><div class="opt-chk"></div></button>
+      </div>
+      <button class="btn btn-disabled" id="b4" onclick="goTo(5)">Ver minha solução ›</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 5 — DIFERENCIAIS + PLANOS -->
+  <div class="screen" id="s5">
+    <div class="card">
+      <span class="step-lbl">Etapa 05 de 05</span>
+      <h2 class="q">A Skalla.ai não entrega só um sistema. Entrega <span>resultado com suporte real.</span></h2>
+
+      <div class="diff-grid">
+        <div class="diff-card">
+          <div class="diff-ico">🎯</div>
+          <div class="diff-t">Assessoria inclusa</div>
+          <div class="diff-d">Nossa equipe configura tudo e treina sua IA com o script do seu negócio</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">⚡</div>
+          <div class="diff-t">Implementação em 24h</div>
+          <div class="diff-d">Do contrato ao sistema funcionando em menos de um dia útil</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">💬</div>
+          <div class="diff-t">Suporte via WhatsApp</div>
+          <div class="diff-d">Atendimento direto com a equipe técnica, sem ticket e sem fila</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">🔗</div>
+          <div class="diff-t">API oficial Meta</div>
+          <div class="diff-d">Número verificado, disparos seguros e proteção contra banimento</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p style="font-size:11px;font-weight:700;color:#6b5a8a;text-transform:uppercase;letter-spacing:1.5px;text-align:center">Planos disponíveis</p>
+
+      <div id="planos-container" style="display:flex;flex-direction:column;gap:10px">
+        <div class="plan-card" id="plan-essencial">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="plan-name">Essencial</div>
+          </div>
+          <div class="plan-price">R$ 147<span style="font-size:13px;color:#6b5a8a;-webkit-text-fill-color:#6b5a8a">/mês</span></div>
+          <div class="plan-feat">1 número de WhatsApp · IA de atendimento · Campanhas e templates · Follow-up automático · Suporte via WhatsApp</div>
+        </div>
+        <div class="plan-card highlight" id="plan-profissional">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="plan-name">Profissional</div>
+            <div class="plan-badge">Mais escolhido</div>
+          </div>
+          <div class="plan-price">R$ 397<span style="font-size:13px;color:#6b5a8a;-webkit-text-fill-color:#6b5a8a">/mês</span></div>
+          <div class="plan-feat">3 números de WhatsApp · Tudo do Essencial · IA avançada · Reengajamento D1, D2 e D3 · Relatórios completos</div>
+        </div>
+        <div class="plan-card" id="plan-enterprise">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">R$ 697<span style="font-size:13px;color:#6b5a8a;-webkit-text-fill-color:#6b5a8a">/mês</span></div>
+          <div class="plan-feat">Números ilimitados · Tudo do Profissional · Extrações ilimitadas · Gerente de conta dedicado</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(6)">Quero implementar ›</button>
+      <p class="foot">Setup em menos de 24 horas · Sem fidelidade</p>
+    </div>
+  </div>
+
+  <!-- ETAPA 6 — DADOS -->
+  <div class="screen" id="s6">
+    <div class="card">
+      <span class="step-lbl">Quase lá!</span>
+      <h2 class="q">Para onde enviamos o resultado do seu diagnóstico?</h2>
+      <p class="sub">Um especialista da Skalla.ai vai entrar em contato com você pelo WhatsApp.</p>
+      <div class="inp-grp">
+        <label class="inp-lbl">Seu nome</label>
+        <input class="inp" type="text" id="f-nome" placeholder="Ex: João Silva" autocomplete="name"/>
+      </div>
+      <div class="inp-grp">
+        <label class="inp-lbl">Empresa ou segmento</label>
+        <input class="inp" type="text" id="f-empresa" placeholder="Ex: Clínica Bem Estar"/>
+      </div>
+      <div class="inp-grp">
+        <label class="inp-lbl">WhatsApp com DDD</label>
+        <input class="inp" type="tel" id="f-wpp" placeholder="(83) 99999-9999" autocomplete="tel"/>
+      </div>
+      <button class="btn btn-primary" onclick="submit()">Ver meu diagnóstico ›</button>
+      <p class="foot">Seus dados estão seguros · Não enviamos spam</p>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen" id="s-load">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;padding:48px 0">
+      <div class="spin"></div>
+      <p style="font-size:16px;font-weight:700;color:#fff">Analisando seu perfil...</p>
+      <div class="ls-list">
+        <div class="ls-item" id="li1"><div class="ls-ico">🔍</div>Identificando o principal problema da sua operação</div>
+        <div class="ls-item" id="li2"><div class="ls-ico">⚡</div>Mapeando a solução ideal para seu caso</div>
+        <div class="ls-item" id="li3"><div class="ls-ico">📊</div>Selecionando o plano certo para seu volume</div>
+        <div class="ls-item" id="li4"><div class="ls-ico">✅</div>Preparando diagnóstico personalizado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="screen" id="s-ok">
+    <div class="card" style="text-align:center;align-items:center">
+      <div class="suc-ico">✅</div>
+      <h2 style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;line-height:1.3;color:#fff">Diagnóstico concluído!</h2>
+      <p style="font-size:15px;color:#9d8cc4;line-height:1.7" id="suc-msg">Nossa equipe vai entrar em contato com você pelo WhatsApp para apresentar a solução mapeada para o seu caso.</p>
+
+      <div class="diff-grid" style="width:100%">
+        <div class="diff-card">
+          <div class="diff-ico">⚡</div>
+          <div class="diff-t">Implementação em 24h</div>
+          <div class="diff-d">Do contrato ao sistema funcionando em menos de um dia</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">🎯</div>
+          <div class="diff-t">Assessoria inclusa</div>
+          <div class="diff-d">Configuramos tudo com o script do seu negócio</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">💬</div>
+          <div class="diff-t">Suporte real</div>
+          <div class="diff-d">Equipe técnica no WhatsApp, sem ticket</div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-ico">🔒</div>
+          <div class="diff-t">Sem fidelidade</div>
+          <div class="diff-d">Cancele quando quiser, sem multa</div>
+        </div>
+      </div>
+
+      <div class="suc-note" id="suc-note">📱 Um especialista da Skalla.ai vai te chamar em instantes.</div>
+
+      <!-- BOTÃO WHATSAPP — evento Lead dispara AQUI -->
+      <button class="btn btn-wpp" id="btn-wpp" onclick="irParaWhatsApp()">
+        <span style="font-size:18px">💬</span>
+        Entrar em contato agora
+      </button>
+
+      <p class="foot">Setup em menos de 24 horas · Sem fidelidade · Sem compromisso</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var answers = {
+  dor: '',
+  dor_label: '',
+  etapa2: '',
+  volume: '',
+  plano_sugerido: '',
+  nome: '',
+  empresa: '',
+  whatsapp: ''
+};
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('show'); });
+  var id = (n === 'load' || n === 'ok') ? 's-' + n : 's' + n;
+  document.getElementById(id).classList.add('show');
+  updateProg(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProg(step) {
+  var label = document.getElementById('prog-label');
+  var fill  = document.getElementById('prog-fill');
+  if (step === 0)      { label.textContent = 'DIAGNÓSTICO SKALLA.AI'; fill.style.width = '0%'; return; }
+  if (step === 6)      { label.textContent = 'Última etapa — quase lá!'; fill.style.width = '92%'; return; }
+  if (step === 'load') { label.textContent = 'Processando...'; fill.style.width = '96%'; return; }
+  if (step === 'ok')   { label.textContent = 'Diagnóstico concluído!'; fill.style.width = '100%'; return; }
+  var stepNum = parseInt(step) || 0;
+  label.textContent = 'Diagnóstico · Etapa ' + stepNum + ' de 5';
+  fill.style.width = (stepNum / 6 * 100) + '%';
+}
+
+// ETAPA 1 — bifurcação por dor
+function pickDor(btn, tipo, label) {
+  document.getElementById('opts1').querySelectorAll('.opt').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  answers.dor = tipo;
+  answers.dor_label = label;
+  var b = document.getElementById('b1');
+  b.className = 'btn btn-primary';
+}
+
+function next1() {
+  if (!answers.dor) return;
+  if (answers.dor === 'atendimento') { goTo('2a'); }
+  else if (answers.dor === 'bloqueio') { goTo('2b'); }
+  else { goTo('2a'); } // ambos — começa pelo atendimento
+}
+
+// ETAPA 2 genérica
+function pick(btn, step, value) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll('.opt').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  answers['etapa' + step] = value;
+  var bId = (step == '2') ? (document.getElementById('b2') ? 'b2' : 'b2b') : 'b' + step;
+  // ativa o botão correto
+  ['b2','b2b'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.className = 'btn btn-primary';
+  });
+}
+
+// ETAPA 4 — volume
+function pickPlano(btn, label, plano) {
+  document.getElementById('opts4').querySelectorAll('.opt').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  answers.volume = label;
+  answers.plano_sugerido = plano;
+  document.getElementById('b4').className = 'btn btn-primary';
+  // destaca plano sugerido
+  ['plan-essencial','plan-profissional','plan-enterprise'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.className = 'plan-card' + (id === 'plan-' + plano ? ' highlight' : '');
+  });
+}
+
+// SUBMIT
+function submit() {
+  var nome    = document.getElementById('f-nome').value.trim();
+  var empresa = document.getElementById('f-empresa').value.trim();
+  var wpp     = document.getElementById('f-wpp').value.trim();
+  if (!nome || !empresa || !wpp) { alert('Por favor, preencha todos os campos.'); return; }
+  answers.nome    = nome;
+  answers.empresa = empresa;
+  answers.whatsapp = wpp;
+  showLoading();
+}
+
+function showLoading() {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('show'); });
+  document.getElementById('s-load').classList.add('show');
+  updateProg('load');
+  window.scrollTo({top:0,behavior:'smooth'});
+  var items = ['li1','li2','li3','li4'];
+  items.forEach(function(id, i){
+    setTimeout(function(){ document.getElementById(id).classList.add('on'); }, 600 + i * 650);
+  });
+  setTimeout(function(){ showSuccess(); }, 600 + items.length * 650 + 400);
+}
+
+function showSuccess() {
+  // mensagem personalizada pela dor
+  var msg = document.getElementById('suc-msg');
+  var note = document.getElementById('suc-note');
+  if (answers.dor === 'bloqueio') {
+    msg.textContent = 'Mapeamos que você precisa de um número blindado com API oficial. Nossa equipe vai te mostrar como nunca mais perder número e disparar em massa com segurança.';
+  } else {
+    msg.textContent = 'Mapeamos que sua operação precisa de IA para não perder nenhum lead. Nossa equipe vai te mostrar como automatizar o atendimento e reengajar quem sumiu.';
+  }
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('show'); });
+  document.getElementById('s-ok').classList.add('show');
+  updateProg('ok');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// BOTÃO WHATSAPP — evento Lead dispara AQUI, não antes
+function irParaWhatsApp() {
+  // monta mensagem com as respostas
+  var tel = answers.whatsapp.replace(/\D/g,'');
+  if (tel.length <= 11) tel = '55' + tel;
+
+  var dorTexto = answers.dor === 'bloqueio'
+    ? 'API oficial / número bloqueado'
+    : answers.dor === 'ambos'
+      ? 'Atendimento com IA + API oficial'
+      : 'Automação de atendimento com IA';
+
+  var msg = 'Olá! Fiz o diagnóstico da Skalla.ai e essas foram minhas respostas:\n\n'
+    + '• Nome: ' + answers.nome + '\n'
+    + '• Empresa: ' + answers.empresa + '\n'
+    + '• Principal problema: ' + answers.dor_label + '\n'
+    + '• Detalhes: ' + (answers.etapa2 || '') + '\n'
+    + '• Volume de leads: ' + answers.volume + '\n'
+    + '• Solução mapeada: ' + dorTexto + '\n'
+    + '• Plano sugerido: ' + (answers.plano_sugerido || 'a definir') + '\n\n'
+    + 'Gostaria de saber mais!';
+
+  // dispara evento Lead AQUI
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'Lead', {
+      content_name: 'Quiz Skalla.ai',
+      content_category: 'Quiz',
+      value: answers.plano_sugerido === 'profissional' ? 397 : answers.plano_sugerido === 'enterprise' ? 697 : 147,
+      currency: 'BRL'
+    });
+  }
+
+  window.open('https://wa.me/5583998916290?text=' + encodeURIComponent(msg), '_blank');
+}
+</script>
+</body>
+</html>
